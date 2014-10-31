@@ -1,0 +1,13 @@
+
+aside section {
+	margin : 10px;
+}
+
+aside section:last-child {
+	margin-bottom : 50px;
+}
+
+aside section:nth-child(1) img {
+	width : 100%;
+} 
+
