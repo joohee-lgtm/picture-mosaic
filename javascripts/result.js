@@ -18,16 +18,20 @@ PictureListSlide.prototype = {
 		eventTarget.addEventListener("click", function(e){
 			if(e.target.tagName.toLowerCase() === photoTag){
 				this.changeLightBoxVisible();
-				this.showTargetImage(e.target);
+				var targetList = e.target.parentNode;
+				var targetNumber = targetList.getAttribute("data-list");
+				this.showTargetImage(targetNumber);
+				var sidebar = document.querySelector("#lightBox nav input[type='range']");
+				sidebar.value = targetNumber;
 			}
 		}.bind(this));
 	},
 
-	showTargetImage : function(target){
-		var targetList = target.parentNode;
-		this.imagePutter("current", targetList);
-		this.imagePutter("previous", targetList);
-		this.imagePutter("next", targetList);
+	showTargetImage : function(targetNumber){
+		var currentList = this.photoNodes[targetNumber].parentNode;
+		this.imagePutter("current", currentList);
+		this.imagePutter("previous", currentList);
+		this.imagePutter("next", currentList);
 	},
 
 	imagePutter : function(classOfArea, targetList){
@@ -54,7 +58,7 @@ PictureListSlide.prototype = {
 
 	createLightBox : function(){
 		var lightBox = "<article id='lightBox' class='hide'>"+
-			"<nav></nav>"+
+			"<nav><input type='button' /></nav>"+
 			"<section><div class='previous'></div>"+
 			"<div class='current'></div>"+
 			"<div class='next'></div></section>"+
@@ -62,7 +66,7 @@ PictureListSlide.prototype = {
 		var place = document.querySelector("body");
 		place.insertAdjacentHTML("afterbegin", lightBox);
 		this.lightBox = place.querySelector("#lightBox");
-		var photolen = this.photoNodes.length;
+		var photolen = this.photoNodes.length - 1;
 		var rangeBar ="<input type='range' min='0' max='"+ photolen + "'>";
 		var nav = this.lightBox.querySelector("nav");
 		nav.insertAdjacentHTML("afterbegin", rangeBar);
@@ -80,11 +84,21 @@ PictureListSlide.prototype = {
 			}
 		});
 
-		this.lightBox.addEventListener("click", function(){
+		var closeButton = this.lightBox.querySelector("input[type='button']");
+		closeButton.addEventListener("click", function(){
 			if(isBoxShow){
 				this.changeLightBoxVisible();
 			}
 		}.bind(this));
-	}
 
+		var slideBar = this.lightBox.querySelector("input[type='range']");
+		slideBar.addEventListener("change", function(e){
+			this.pictureMoveAlongSlideBar(e);
+		}.bind(this));
+	},
+
+	pictureMoveAlongSlideBar : function(evt){
+		var targetNumber = evt.target.valueAsNumber;
+		this.showTargetImage(targetNumber);
+	}
 }
