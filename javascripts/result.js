@@ -15,12 +15,32 @@ PictureListSlide.prototype = {
 		var eventTarget = this.photoNodes[0].parentNode.parentNode;
 		var parentNodeTag = this.photoNodes[0].parentNode.tagName.toLowerCase();
 		var photoTag = this.photoNodes[0].tagName.toLowerCase();
-
 		eventTarget.addEventListener("click", function(e){
 			if(e.target.tagName.toLowerCase() === photoTag){
 				this.changeLightBoxVisible();
+				this.showTargetImage(e.target);
 			}
 		}.bind(this));
+	},
+
+	showTargetImage : function(target){
+		var targetList = target.parentNode;
+		this.imagePutter("current", targetList);
+		this.imagePutter("previous", targetList);
+		this.imagePutter("next", targetList);
+	},
+
+	imagePutter : function(classOfArea, targetList){
+		var area = this.lightBox.querySelector("." + classOfArea);
+		var toPut = targetList;
+		var toPutInner = "";
+		
+		if(classOfArea !="current"){
+			toPut = targetList[classOfArea + "ElementSibling"];
+		};
+		if(toPut != null) toPutInner = toPut.innerHTML;
+
+		area.innerHTML = toPutInner;
 	},
 
 	changeLightBoxVisible : function(){
@@ -33,10 +53,19 @@ PictureListSlide.prototype = {
 	},
 
 	createLightBox : function(){
-		var lightBox = "<article id='lightBox' class='hide'></article>";
+		var lightBox = "<article id='lightBox' class='hide'>"+
+			"<nav></nav>"+
+			"<section><div class='previous'></div>"+
+			"<div class='current'></div>"+
+			"<div class='next'></div></section>"+
+			"</article>";
 		var place = document.querySelector("body");
 		place.insertAdjacentHTML("afterbegin", lightBox);
 		this.lightBox = place.querySelector("#lightBox");
+		var photolen = this.photoNodes.length;
+		var rangeBar ="<input type='range' min='0' max='"+ photolen + "'>";
+		var nav = this.lightBox.querySelector("nav");
+		nav.insertAdjacentHTML("afterbegin", rangeBar);
 		this.lightBoxEvent();
 	},
 
